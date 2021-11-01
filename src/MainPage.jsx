@@ -2,6 +2,9 @@ import React, {useState, useEffect} from "react";
 import {Container, Grid, Card, CardContent, Typography} from "@mui/material";
 import axios from "axios";
 import moment from "moment";
+import WeatherIcons from "react-animated-weather";
+import WeatherCard from "./Components/WeatherCard";
+import LinearBofort from "./Components/LinearBofort";
 import {KeltoCel} from "temperatureconv";
 
 function MainPage(props) {
@@ -12,6 +15,7 @@ function MainPage(props) {
 	const [tempSys, setTempSys] = useState("°C");
 
 	const [isLoading, setIsLoading] = useState(true);
+	const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
 
 	function getWeather(loc) {
 		axios.post("/get/one", {
@@ -20,6 +24,7 @@ function MainPage(props) {
 			setTemp(d.data.weather.main.temp);
 			setData(d.data.weather);
 			setIsLoading(false);
+			setIsLoadingDisplay(false);
 		})
 	}
 
@@ -59,6 +64,37 @@ function MainPage(props) {
 		}
 	}
 
+	function getIconNameWeather(code, icon = "01d") {
+		const c = code.toString();
+		if (c[0] === "2") {
+			return "CLOUDY";
+		} else if (c[0] === "3") {
+			return "RAIN"
+		} else if (c[0] === "5") {
+			return "SLEET"
+		} else if (c[0] === "6") {
+			return "SNOW"
+		} else if (c === "731" || c === "771" || c === "781") {
+			return "WIND"
+		} else if (c[0] === "7") {
+			return "FOG"
+		} else if (c === "800") {
+			if (icon[2] === "d") {
+				return "CLEAR_DAY";
+			} else if (icon[2] === "n") {
+				return "CLEAR_NIGHT";
+			}
+		} else if (c === "801" || c === "802") {
+			if (icon[2] === "d") {
+				return "PARTLY_CLOUDY_DAY";
+			} else if (icon[2] === "n") {
+				return "PARTLY_CLOUDY_NIGHT";
+			}
+		} else if (c === "803" || c === "804") {
+			return "CLOUDY";
+		}
+	}
+
 	useEffect(() => {
 		if (isLoading) {
 			getWeather(props.match.params.city)
@@ -72,53 +108,18 @@ function MainPage(props) {
 
 	return <Container>
 		{
-			!isLoading
+			!isLoadingDisplay
 				? <div>
 					<h3>{city} | {data.weather[0].description}</h3>
-					<h1>{KeltoCel(temp).toFixed(1)} {tempSys}</h1>
+					<h1><WeatherIcons icon={getIconNameWeather(data.weather[0].id, data.weather[0].icon)} size={45}/> {KeltoCel(temp).toFixed(1)} {tempSys}</h1>
 					<h5>{KeltoCel(data.main.temp_min).toFixed(1)} {tempSys} / {KeltoCel(data.main.temp_max).toFixed(1)} {tempSys}</h5>
 					<br/>
 					<Grid container spacing={2}>
-						<Grid item xs={12} lg={4}>
-							<Card>
-								<CardContent>
-									<Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Ветер</Typography>
-									<Typography variant="h5" component="div">{data.wind.speed} м/с {getWind(data.wind.deg)}</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid item xs={12} lg={4}>
-							<Card>
-								<CardContent>
-									<Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Восход/Закат</Typography>
-									<Typography variant="h5" component="div">{moment(data.sys.sunrise, "X").format("HH:mm")} - {moment(data.sys.sunset, "X").format("HH:mm")}</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid item xs={12} lg={4}>
-							<Card>
-								<CardContent>
-									<Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Давление</Typography>
-									<Typography variant="h5" component="div">{(data.main.pressure / 1.333).toFixed(2)} мм рт ст</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid item xs={12} lg={4}>
-							<Card>
-								<CardContent>
-									<Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Влажность</Typography>
-									<Typography variant="h5" component="div">{data.main.humidity} %</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid item xs={12} lg={4}>
-							<Card>
-								<CardContent>
-									<Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Видимость</Typography>
-									<Typography variant="h5" component="div">{data.visibility} м</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
+						<WeatherCard title="Ветер" value={`${data.wind.speed} м/с ${getWind(data.wind.deg)}`}><LinearBofort wind={data.wind.speed}/></WeatherCard>
+						<WeatherCard title="Восход/Закат" value={`${moment(data.sys.sunrise, "X").format("HH:mm")} - ${moment(data.sys.sunset, "X").format("HH:mm")}`}></WeatherCard>
+						<WeatherCard title="Давление" value={`${(data.main.pressure / 1.333).toFixed(2)} мм рт ст`}></WeatherCard>
+						<WeatherCard title="Влажность" value={`${data.main.humidity} %`}></WeatherCard>
+						<WeatherCard title="Видимость" value={`${data.visibility} м`}></WeatherCard>
 					</Grid>
 				</div>
 				: <p>Loading...</p>
