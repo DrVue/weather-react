@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {Container, Grid, LinearProgress} from "@mui/material";
+import {Container, Grid, LinearProgress, CircularProgress} from "@mui/material";
 import axios from "axios";
 import moment from "moment";
 import WeatherIcons from "react-animated-weather";
@@ -122,7 +122,7 @@ function MainPage(props) {
 						<WeatherCard title="Видимость" value={`${data.visibility} м`}><div><br/><LinearProgress variant="determinate" value={data.visibility / 100}/></div></WeatherCard>
 					</Grid>
 				</div>
-				: <p>Loading...</p>
+				: <CircularProgress/>
 		}
 	</Container>
 }

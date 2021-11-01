@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {withRouter} from "react-router-dom";
 import {styled, alpha} from "@mui/material";
 import {AppBar, Box, Toolbar, IconButton, Typography, InputBase, Button, InputAdornment} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import MenuIcon from "@mui/icons-material/Cloud";
 import SearchIcon from "@mui/icons-material/Search";
 
 const Search = styled("div")(({theme}) => ({
@@ -57,6 +57,7 @@ function Header(props) {
 					edge="start"
 					color="inherit"
 					sx={{mr: 2}}
+					onClick={() => props.history.push("/")}
 				>
 					<MenuIcon/>
 				</IconButton>
