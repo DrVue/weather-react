@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {Container, Grid, Card, CardContent, Typography} from "@mui/material";
+import {Container, Grid, LinearProgress} from "@mui/material";
 import axios from "axios";
 import moment from "moment";
 import WeatherIcons from "react-animated-weather";
@@ -116,10 +116,10 @@ function MainPage(props) {
 					<br/>
 					<Grid container spacing={2}>
 						<WeatherCard title="Ветер" value={`${data.wind.speed} м/с ${getWind(data.wind.deg)}`}><LinearBofort wind={data.wind.speed}/></WeatherCard>
-						<WeatherCard title="Восход/Закат" value={`${moment(data.sys.sunrise, "X").format("HH:mm")} - ${moment(data.sys.sunset, "X").format("HH:mm")}`}></WeatherCard>
-						<WeatherCard title="Давление" value={`${(data.main.pressure / 1.333).toFixed(2)} мм рт ст`}></WeatherCard>
-						<WeatherCard title="Влажность" value={`${data.main.humidity} %`}></WeatherCard>
-						<WeatherCard title="Видимость" value={`${data.visibility} м`}></WeatherCard>
+						<WeatherCard title="Восход/Закат" value={`${moment(data.sys.sunrise, "X").format("HH:mm")} - ${moment(data.sys.sunset, "X").format("HH:mm")}`}/>
+						<WeatherCard title="Давление" value={`${(data.main.pressure / 1.333).toFixed(2)} мм рт ст`}/>
+						<WeatherCard title="Влажность" value={`${data.main.humidity} %`}><div><br/><LinearProgress variant="determinate" value={data.main.humidity}/></div></WeatherCard>
+						<WeatherCard title="Видимость" value={`${data.visibility} м`}><div><br/><LinearProgress variant="determinate" value={data.visibility / 100}/></div></WeatherCard>
 					</Grid>
 				</div>
 				: <p>Loading...</p>
